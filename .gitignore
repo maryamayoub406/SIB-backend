@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+
+# environment
+.env
+
+# ML heavy files
+*.pkl
+*.npy
+*.pth
+
+# virtual env
+venv/
+.env/
+
+# system
+.DS_Store
