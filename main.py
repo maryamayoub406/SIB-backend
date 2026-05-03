@@ -2,6 +2,7 @@
 FastAPI main application entry point.
 AI-Driven Sodium-Ion Battery Material Discovery Platform
 """
+
 import os
 from pathlib import Path
 from contextlib import asynccontextmanager
@@ -11,10 +12,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 
-# Load .env
+# Load environment variables
 load_dotenv(Path(__file__).parent / ".env")
 
-# Local imports (NO backend prefix)
+# ✅ Correct imports (NO backend prefix)
 from database import engine, check_db_connection
 from models.db_models import Base
 from routers import predict, generate, degradation, rank, materials, auth
@@ -25,32 +26,31 @@ from routers import predict, generate, degradation, rank, materials, auth
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("=" * 60)
-    print("  SIB Discovery Platform — Backend Starting")
+    print("  SIB Backend Starting")
     print("=" * 60)
 
     # DB setup
     try:
         Base.metadata.create_all(bind=engine)
         db_ok = check_db_connection()
-        print(f"  [DB] {'Connected ✓' if db_ok else 'Offline'}")
+        print(f"[DB] {'Connected ✓' if db_ok else 'Offline'}")
     except Exception as e:
-        print(f"  [DB] Warning: {e}")
+        print(f"[DB] Warning: {e}")
 
     # ML models
     try:
-        from ml.predictor import get_models   # ✅ FIXED
+        from ml.predictor import get_models
         get_models()
-        print("  [ML] Property predictor loaded ✓")
+        print("[ML] Loaded ✓")
     except Exception as e:
-        print(f"  [ML] Warning: {e}")
+        print(f"[ML] Warning: {e}")
 
-    print("  Server ready")
+    print("Server ready")
     print("=" * 60)
 
     yield
 
-    print("[Shutdown] SIB Platform stopping.")
-
+    print("Shutting down...")
 
 # ----------------------------------------------------------------
 # App
@@ -88,7 +88,7 @@ app.include_router(materials.router)
 app.include_router(auth.router)
 
 # ----------------------------------------------------------------
-# Health check
+# Routes
 # ----------------------------------------------------------------
 @app.get("/health")
 async def health():
@@ -106,7 +106,7 @@ async def root():
     }
 
 # ----------------------------------------------------------------
-# Global exception handler
+# Error handler
 # ----------------------------------------------------------------
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
@@ -116,8 +116,11 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 # ----------------------------------------------------------------
-# Dev entry
+# Local run
 # ----------------------------------------------------------------
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)  # ✅ FIXED
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
+
+    
